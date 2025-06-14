@@ -19,11 +19,12 @@ mip_br <- raw # Copy for edition
 h5_regions <- as.character(raw[5, ])
 h6_sectors <- as.character(raw[6, ])
 
+# Remove last two rows
+mip_br <- mip_br[-(nrow(raw) - 1):-nrow(raw), ]
+
 # Remove first six rows
 mip_br <- mip_br[-1:-6, ]
 
-# Remove last two rows
-mip_br <- mip_br[-(nrow(raw) - 1):-nrow(raw), ]
 
 # Remove second to last row
 row_target <- unlist(mip_br[(nrow(mip_br) - 1), ])
@@ -34,3 +35,11 @@ mip_br <- mip_br[-(nrow(mip_br) - 1), ]
 col_target <- unlist(mip_br[, (ncol(mip_br) - 1)])
 stopifnot("Unexpected Data" = all(is.na(col_target)))
 mip_br <- mip_br[, -(ncol(mip_br) - 1)]
+
+# Row and Col keys
+col_keys <- str_c(h5_regions, " ::: ", h6_sectors)
+row_keys <- str_c(mip_br[[1]], " ::: ", mip_br[[2]])
+
+# Drop first two cols
+mip_br <- mip_br |>
+  select(-...1, -...2)
