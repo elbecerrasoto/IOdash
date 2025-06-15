@@ -15,4 +15,17 @@ if (!file.exists(MIP_BR)) {
 
 row_keys <- Z$row_keys
 
+# First approach less general
+# using the numbers of on columns
+
 Z <- Z |> select(-row_keys)
+your_tibble %>%
+  mutate(across(everything(), ~ replace_na(.x, 0)))
+
+N_SECTORS <- 35
+names(Z)
+
+names(Z)
+(Z)
+# Calculate the xj's to calculate the aij
+row_keys

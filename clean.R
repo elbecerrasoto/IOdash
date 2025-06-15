@@ -61,4 +61,8 @@ mip_br <- mip_br |>
 names(mip_br) <- col_keys
 mip_br$row_keys <- row_keys
 
-write_tsv(mip_br, OUT)
+# Input 0 on any NA cell
+# and then write into a tsv
+mip_br |>
+  mutate(across(everything(), ~ replace_na(.x, 0))) |>
+  write_tsv(OUT)

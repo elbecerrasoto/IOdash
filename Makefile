@@ -4,6 +4,9 @@ URL = $(STEM)/$(XLSX)
 
 TSV = mip_br.tsv
 
+.PHONY all:
+all: $(TSV)
+
 .PHONY help:
 help:
 	less Makefile
