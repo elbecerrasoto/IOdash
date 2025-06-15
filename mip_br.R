@@ -1,16 +1,17 @@
 #!/usr/bin/Rscript
 
 library(tidyverse)
-library(janitor)
 library(readxl)
 library(glue)
 
-STEM <- "https://www.inegi.org.mx/contenidos/investigacion/coumip/tabulados"
-MIP_BR <- "mip_ixi_br_sin_d_2018.xlsx"
+
+ARGV <- commandArgs(trailingOnly = TRUE)
+MIP_BR <- ARGV[[1]]
 
 if (!file.exists(MIP_BR)) {
-  system(glue("wget {STEM}/{MIP_BR}"))
+  stop(glue("The file specified by {MIP_BR} does not exist."))
 }
+stopifnot(msg = file.exists(MIP_BR))
 
 mip_br <- read_xlsx(MIP_BR, col_names = FALSE)
 
@@ -57,6 +58,6 @@ mip_br <- mip_br |>
 
 
 names(mip_br) <- col_keys
-mip_br$row_key <- row_keys
+mip_br$row_keys <- row_keys
 
 write_tsv(mip_br, "mip_br.tsv")
