@@ -2,6 +2,8 @@ XLSX = mip_ixi_br_sin_d_2018.xlsx
 STEM = https://www.inegi.org.mx/contenidos/investigacion/coumip/tabulados
 URL = $(STEM)/$(XLSX)
 
+TSV = mip_br.tsv
+
 .PHONY help:
 help:
 	less Makefile
@@ -9,7 +11,7 @@ help:
 .PHONY check:
 check:
 	make clean
-	make mip_br.tsv
+	make $(TSV)
 
 .PHONY style:
 style:
@@ -18,11 +20,11 @@ style:
 $(XLSX):
 	wget $(URL)
 
-mip_br.tsv: $(XLSX)
-	Rscript mip_br.R $(XLSX) 2> /dev/null
+$(TSV): $(XLSX)
+	Rscript clean.R $(XLSX) $(TSV) 2> /dev/null
 
 .PHONY clean:
 clean:
-	rm -f mip_br.tsv $(XLSX) 
+	rm -f $(XLSX) $(TSV)
 
 

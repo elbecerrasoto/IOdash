@@ -1,26 +1,27 @@
 #!/usr/bin/Rscript
-
 library(tidyverse)
 library(readxl)
 library(glue)
 
-
 ARGV <- commandArgs(trailingOnly = TRUE)
-MIP_BR <- ARGV[[1]]
+IN <- ARGV[[1]]
+OUT <- ARGV[[2]]
 
-if (!file.exists(MIP_BR)) {
-  stop(glue("The file specified by {MIP_BR} does not exist."))
+# IN <- "mip_ixi_br_sin_d_2018.xlsx"
+# OUT <- "mip_br.tsv"
+
+if (!file.exists(IN)) {
+  stop(glue("The file specified by {IN} does not exist."))
 }
-stopifnot(msg = file.exists(MIP_BR))
 
-mip_br <- read_xlsx(MIP_BR, col_names = FALSE)
+mip_br <- read_xlsx(IN, col_names = FALSE)
 
 # Remove the last 4 rows
-# Metadata and Total and Empty
+# Metadata (2 rows), Total (1 row) and Empty (1 row)
 mip_br <- mip_br |> slice(-(n() - 3):-n())
 
 # Remove the last 2 columns
-mip_br <- mip_br[-(nrow(mip_br) - 1):-nrow(mip_br)]
+mip_br <- mip_br[-(ncol(mip_br) - 1):-ncol(mip_br)]
 
 # Extract row and col names
 # row keys and col keys
@@ -60,4 +61,4 @@ mip_br <- mip_br |>
 names(mip_br) <- col_keys
 mip_br$row_keys <- row_keys
 
-write_tsv(mip_br, "mip_br.tsv")
+write_tsv(mip_br, OUT)
