@@ -2,30 +2,34 @@
 library(tidyverse)
 library(glue)
 
-ARGV <- commandArgs(trailingOnly = TRUE)
+# Script to calculate Z, A, L
+
+# ---- globals
+
+N_SECTORS <- 35
+TOLERANCE <- 0.0001
+
+# ARGV <- commandArgs(trailingOnly = TRUE)
 # MIP_BR <- ARGV[[1]]
 
 MIP_BR <- "mip_br.tsv"
-Z <- read_tsv(MIP_BR)
-names(Z)
 
 if (!file.exists(MIP_BR)) {
   stop(glue("The file specified by {MIP_BR} does not exist."))
 }
 
-row_keys <- Z$row_keys
+# ---- code
+
+mip_br <- read_tsv(MIP_BR)
+row_keys <- mip_br$row_keys
+mip_br <- mip_br |> select(-row_keys)
 
 # First approach less general
-# using the numbers of on columns
+# using the numbers on columns
+Z <- mip_br[1:N_SECTORS, 1:N_SECTORS]
 
-Z <- Z |> select(-row_keys)
-your_tibble %>%
-  mutate(across(everything(), ~ replace_na(.x, 0)))
+xjs_byrow <- rowSums(mip_br)[1:N_SECTORS]
+xjs_bycol <- colSums(mip_br)[1:N_SECTORS]
 
-N_SECTORS <- 35
-names(Z)
-
-names(Z)
-(Z)
-# Calculate the xj's to calculate the aij
-row_keys
+is_accounting_good <- all(near(xjs_byrow, xjs_bycol, TOLERANCE))
+stopifnot("Row and Col totals do NOT match." = is_accounting_good)
