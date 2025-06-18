@@ -46,7 +46,7 @@ clean_mipbr_xlsx <- function(xlsx) {
   # Make everything numeric
   mip_br <- mip_br |>
     mutate(across(everything(), as.double))
-
+harta
 
   names(mip_br) <- col_keys
   mip_br$row_keys <- row_keys
