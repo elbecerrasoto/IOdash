@@ -6,7 +6,22 @@ source("clean.R")
 
 # ---- globals
 
+DOWNLOAD <- FALSE
 STEM <- "https://www.inegi.org.mx/contenidos/investigacion/coumip/tabulados"
+
+DATA_DIR <- "data"
+# Create directory outside function calls
+# as to avoid any weird concurrent effects
+if (!file.exists(DATA_DIR)) {
+  dir.create(DATA_DIR)
+}
+
+CORES <- future::availableCores()
+if (.Platform$OS.type == "windows") {
+  plan(multicore, workers = CORES)
+} else {
+  plan(multisession, workers = CORES)
+}
 
 STATE_CODES <- c(
   aguascalientes = "ags",
@@ -43,41 +58,19 @@ STATE_CODES <- c(
   zacatecas = "zac"
 )
 
-DATA_DIR <- "data"
-if (!file.exists(DATA_DIR)) {
-  dir.create(DATA_DIR)
-}
-
 URLs <- str_c(STEM, "/mip_ixi_br_", STATE_CODES, "_d_2018.xlsx")
-# XLSXs <- str_c("data/mip_ixi_br_", STATE_CODES, "_d_2018.xlsx")
 TSVs <- str_c("data/mip_ixi_br_", STATE_CODES, "_d_2018.tsv")
 
 # ---- code
 
-get_xlsx <- function(url, dir) {
-  # if (!file.exists(dir)) {
-  #   dir.create(dir)
-  # }
-  system(glue("wget -P {dir} {url}"))
-  file_name <- str_extract(url, "mip_ixi_br_\\w+_d_2018\\.xlsx$")
-  glue("{dir}/{file_name}")
-}
-
 main <- function(i) {
   url_i <- URLs[[i]]
-  # xlsx_i <- XLSXs[[i]]
   tsv_i <- TSVs[[i]]
 
-  get_xlsx(url_i, DATA_DIR) |>
-    clean_mipbr_xlsx() |>
-    write_tsv(tsv_i)
-}
+  xlsx_i <- get_xlsx(url_i, DATA_DIR, dry = DOWNLOAD)
 
-CORES <- future::availableCores()
-if (.Platform$OS.type == "windows") {
-  plan(multicore, workers = CORES)
-} else {
-  plan(multisession, workers = CORES)
+  clean_mipbr_xlsx(xlsx_i) |>
+    write_tsv(tsv_i)
 }
 
 done <- future_map(1:length(URLs), main)

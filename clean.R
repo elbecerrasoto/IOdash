@@ -1,9 +1,16 @@
 #!/usr/bin/Rscript
 library(tidyverse)
+library(janitor)
 library(readxl)
 library(glue)
 
+DEVELOP <- TRUE
+
 clean_mipbr_xlsx <- function(xlsx) {
+  if (!file.exists(xlsx)) {
+    stop(glue("file '{xlsx}' does not exist."))
+  }
+
   mip_br <- read_xlsx(xlsx, col_names = FALSE)
 
   # Remove the last 4 rows
@@ -46,7 +53,6 @@ clean_mipbr_xlsx <- function(xlsx) {
   # Make everything numeric
   mip_br <- mip_br |>
     mutate(across(everything(), as.double))
-harta
 
   names(mip_br) <- col_keys
   mip_br$row_keys <- row_keys
@@ -57,7 +63,26 @@ harta
     mutate(across(everything(), ~ replace_na(.x, 0)))
 }
 
-if (sys.nframe() == 0) {
-  IN_sin <- "mip_ixi_br_sin_d_2018.xlsx"
-  OUT_sin <- "mip_ixi_br_sin_d_2018.tsv"
+get_xlsx <- function(url, dir, download = TRUE) {
+  if (!file.exists(dir)) {
+    dir.create(dir)
+  }
+  if (download) {
+    system(glue("wget -P {dir} {url}"))
+  }
+  file_name <- str_extract(url, "mip_ixi_br_\\w+_d_2018\\.xlsx$")
+  glue("{dir}/{file_name}")
+}
+
+if (DEVELOP) {
+  DOWLOAD <- FALSE
+  NAME <- "mip_ixi_br_sin_d_2018"
+  DIR <- "data"
+
+  URL <- glue("https://www.inegi.org.mx/contenidos/investigacion/coumip/tabulados/{NAME}.xlsx")
+  IN <- glue("{DIR}/{NAME}.xlsx")
+  OUT <- "{DIR}/{NAME}.tsv"
+
+  xlsx <- get_xlsx(URL, DIR, download = DOWLOAD)
+  mipbr <- clean_mipbr_xlsx(xlsx)
 }
