@@ -1,0 +1,82 @@
+/* Change header background and text color */
+.skin-blue .main-header .navbar {
+  background-color: #898AC4 !important;  
+}
+
+/* Change hover color for header items */
+.skin-blue .main-header .navbar .sidebar-toggle:hover {
+  background-color: #4d4e99 !important;
+}
+
+/* Style the logo area (left side of header) */
+.skin-blue .main-header .logo {
+  background-color: #4d4e99 !important;
+  color: #FFFFFF !important;
+  font-weight: bold;
+}
+
+/* Change logo on hover */
+.skin-blue .main-header .logo:hover {
+  background-color: #4d4e99 !important;
+}
+
+/* Customize title styling */
+.main-header .logo .navbar-custom-menu {
+  font-family: 'Arial', sans-serif;
+  font-size: 18px;
+}
+
+/* ----------- SIDEBAR STYLES ----------- */
+
+/* Main sidebar background */
+.skin-blue .main-sidebar {
+  background-color: #2C3E50 !important;  /* Background color */
+}
+
+/* Menu items text */
+.skin-blue .main-sidebar .sidebar .sidebar-menu a {
+  color: #ECF0F1 !important;  /* Normal text color */
+  font-family: 'Arial', sans-serif;
+  font-size: 14px;
+  border-left: 3px solid transparent !important;
+}
+
+/* Active/selected menu items */
+.skin-blue .main-sidebar .sidebar .sidebar-menu .active a {
+  background-color: #34495E !important;
+  color: #FFFFFF !important;
+  font-weight: bold;
+  border-left: 3px solid #4d4e99 !important;
+}
+
+/* Icons styling */
+.skin-blue .main-sidebar .sidebar .sidebar-menu .fa {
+  width: 20px;
+  color: #BDC3C7 !important;
+}
+
+/* Submenus (if used) */
+.skin-blue .sidebar-menu > li > .treeview-menu {
+  background-color: #1A242F !important;
+  margin: 0 !important;
+}
+
+/* Items separator */
+.skin-blue .sidebar-menu li.header {
+  color: #7F8C8D !important;
+  background-color: #1A242F !important;
+  font-size: 12px;
+  padding: 10px 15px !important;
+}
+
+/* ----------- ADVANCED DESIGN EXTRAS ----------- */
+
+/* Modern shadow effect */
+.main-sidebar {
+  box-shadow: 2px 0 10px rgba(0,0,0,0.1) !important;
+}
+
+/* Smooth state transitions */
+.sidebar-menu li a {
+  transition: all 0.3s ease !important;
+}
