@@ -6,7 +6,7 @@ library(glue)
 
 # ---- globals
 
-TOLERANCE = 1e-4
+TOLERANCE <- 1e-4
 
 # ---- helpers
 
@@ -36,8 +36,10 @@ multipliers_package <-
 
 multipliers_manual <- colSums(L)
 
-are_mult_equal <- all(near(multipliers_manual,
-     multipliers_package[1], TOLERANCE))
+are_mult_equal <- all(near(
+  multipliers_manual,
+  multipliers_package[1], TOLERANCE
+))
 stopifnot("Error in Multipliers." = are_mult_equal)
 
 L |>
@@ -45,6 +47,8 @@ L |>
   names()
 help(janitor)
 
-multipliers <- tibble(sector = names(multipliers_manual),
-                      region = "",
-                      output_multiplier = multipliers_manual)  
+multipliers <- tibble(
+  sector = names(multipliers_manual),
+  region = "",
+  output_multiplier = multipliers_manual
+)
