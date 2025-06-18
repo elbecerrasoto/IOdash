@@ -65,7 +65,10 @@ A <- Z |>
   imap(normalize_sector) |>
   as_tibble()
 
-L <- leontief_inverse(A) |> as_tibble()
+L <- A |>
+  as.matrix() |>
+  leontief_inverse() |>
+  as_tibble()
 names(L) <- names(A)
 
 write_tsv(Z, OUT_Z)
