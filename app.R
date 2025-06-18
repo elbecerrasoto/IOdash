@@ -7,6 +7,8 @@ library(igraph)
 library(heatmaply)
 library(dplyr)
 
+states <- read.csv("data/states.csv", encoding = "UTF-8")
+
 # User Interface
 ui <- dashboardPage(
   dashboardHeader(title = "IO Dashboard"),
@@ -26,6 +28,12 @@ ui <- dashboardPage(
       # First tab: Summary
       tabItem(tabName = "summary",
               h2("Data Summary"),
+              selectInput(
+                "states",
+                "Select a State:",
+                choices = setNames(states$corto, states$nombre),  # Shows complete name, but uses short name
+                selected = "CDMX"
+              ),
               DTOutput("tabla_summary")),
       
       # Second tab: Simulator
