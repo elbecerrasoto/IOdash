@@ -8,15 +8,10 @@ help:
 
 .PHONY check:
 check:
-	make clean
 	make all 
 
 .PHONY style:
 style:
 	Rscript -e 'styler::style_dir(".", recursive = FALSE)'
-
-.PHONY clean:
-clean:
-	rm -rf data
 
 
