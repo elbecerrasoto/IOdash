@@ -75,43 +75,46 @@ server <- function(input, output, session) {
   # States data
   state_data <- reactive({
     req(input$state)
-    
+
     # Find file with regex
     pattern <- sprintf("mip_ixi_br_%s_d_\\d{4}\\.(tsv|xlsx)", input$state)
     files <- list.files("data/", pattern = pattern, full.names = TRUE)
-    
+
     if (length(files) == 0) {
       showNotification("No file found for this State", type = "warning")
       return(NULL)
     }
-    
+
     # Search for the most recent file
-    selected_file <- files[1] 
-    
+    selected_file <- files[1]
+
     # Read file by it's MIME
     ext1 <- tools::file_ext(selected_file)
-    
-    tryCatch({
-      if (ext1 == "tsv") {
-        dfState <- read.delim(selected_file, na.strings = c("", "NA", "N/A"))
-      } else if (ext1 == "xlsx") {
-        dfState <- read_excel(selected_file, na = c("", "NA", "N/A"))
+
+    tryCatch(
+      {
+        if (ext1 == "tsv") {
+          dfState <- read.delim(selected_file, na.strings = c("", "NA", "N/A"))
+        } else if (ext1 == "xlsx") {
+          dfState <- read_excel(selected_file, na = c("", "NA", "N/A"))
+        }
+
+        # Limpieza segura de datos:
+        if (!is.null(dfState)) {
+          dfState <- dfState %>%
+            mutate(across(where(is.numeric), ~ ifelse(is.na(.), 0, .))) %>%
+            mutate(across(where(is.character), ~ ifelse(is.na(.), "", .)))
+        }
+
+        return(dfState)
+      },
+      error = function(e) {
+        showNotification(paste("Error loading state data:", e$messageState), type = "error")
+        return(NULL)
       }
-      
-      # Limpieza segura de datos:
-      if (!is.null(dfState)) {
-        dfState <- dfState %>%
-          mutate(across(where(is.numeric), ~ ifelse(is.na(.), 0, .))) %>%
-          mutate(across(where(is.character), ~ ifelse(is.na(.), "", .)))
-      }
-      
-      return(dfState)
-    }, error = function(e) {
-      showNotification(paste("Error loading state data:", e$messageState), type = "error")
-      return(NULL)
-    })
+    )
   })
-  
+
   # Render table
   output$state_data <- renderDT({
     req(state_data())
@@ -121,7 +124,7 @@ server <- function(input, output, session) {
         scrollX = TRUE,
         pageLength = 35,
         language = list(search = "Search:"),
-        
+
         # Give tooltip the title of the column
         initComplete = JS("
         function(settings, json) {
@@ -134,7 +137,7 @@ server <- function(input, output, session) {
       )
     )
   })
-  
+
   # Data for summary
   datos <- reactive({
     data.frame(

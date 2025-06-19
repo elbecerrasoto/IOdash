@@ -180,7 +180,6 @@ link_class[BL < 1 & FL >= 1] <- "demand_dependent"
 link_class[BL >= 1 & FL < 1] <- "supply_dependent"
 link_class[BL >= 1 & FL >= 1] <- "dependent"
 
-
 multipliers <- multipliers |>
   mutate(
     link_backward = BL,
@@ -189,11 +188,32 @@ multipliers <- multipliers |>
   ) |>
   select(multiplier, link_class, sector, code, everything())
 
-multipliers |>
-  arrange(desc(multiplier)) |>
-  view()
-
 # ---- get employment
 
 population <- read_tsv(POPULATION) |>
   left_join(state_mipbr, join_by(state))
+
+# ---- production simulator
+
+production <- tibble(f_2018 = f, x_2018 = x, sector = multipliers$sector)
+
+simulate_demand_shock <-
+  function(shocks, f_old, x_old, shocks_are_multipliers = FALSE, shocks_are_total_demand = FALSE) {
+    if (shocks_are_multipliers) {
+      f_new <- shocks * f_old
+    } else if (shocks_are_total_demand) {
+      f_new <- shocks
+    } else {
+      f_new <- shocks + f_old
+    }
+    x_new <- Lm %*% f_new |> as.numeric()
+    delta <- x_new - x_old
+    delta_rel <-
+      if_else(x_old != 0, (delta + x_old) / x_old, (delta + x_old) / 1)
+    tibble(f_old, x_old, f_new, x_new, delta, delta_rel)
+  }
+
+simulate_demand_shock(shocks, f, x)
+
+
+# ---- employment simulator
