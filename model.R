@@ -104,6 +104,7 @@ get_L <- function(A) {
 
 Z_aug <- read_tsv(Z_AUG) |> select(where(is.numeric))
 Z <- Z_aug[1:N_SECTORS, 1:N_SECTORS]
+sector_names <- names(Z)
 Zm <- tib2mat(Z, drop_names = TRUE)
 
 x_row <- rowSums(Z_aug[1:N_SECTORS, ])
@@ -153,10 +154,44 @@ multipliers <- multipliers |>
     region = region,
     code = naics,
     sector = sector
-  )
+  ) |>
+  select(-sector_raw)
+
+assert_matches_leontief_library <-
+  output_multiplier(Lm) |>
+  as.numeric() |>
+  near(multipliers$multiplier, TOLERANCE) |>
+  all()
+stopifnot("Multipliers, does NOT matches leontief library." = assert_matches_leontief_library)
 
 # ---- expand multipliers to other summaries
 
+BL <- leontief::forward_linkage(Am) |>
+  as.numeric() |>
+  set_names(sector_names)
+FL <- leontief::backward_linkage(Am) |>
+  as.numeric() |>
+  set_names(sector_names)
+
+link_class <- vector(mode = "character", length = length(BL))
+
+link_class[BL < 1 & FL < 1] <- "independent"
+link_class[BL < 1 & FL >= 1] <- "demand_dependent"
+link_class[BL >= 1 & FL < 1] <- "supply_dependent"
+link_class[BL >= 1 & FL >= 1] <- "dependent"
+
+
+multipliers <- multipliers |>
+  mutate(
+    link_backward = BL,
+    link_forward = FL,
+    link_class = link_class
+  ) |>
+  select(multiplier, link_class, sector, code, everything())
+
+multipliers |>
+  arrange(desc(multiplier)) |>
+  view()
 
 # ---- get employment
 
