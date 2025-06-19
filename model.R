@@ -9,6 +9,8 @@ TOLERANCE <- 1e-2
 N_SECTORS <- 35 * 2
 Z_AUG <- "data/mip_ixi_br_cdmx_d_2018.tsv"
 
+POPULATION <- "data/population_2020.tsv"
+
 EXTRA_ROWS <- c(
   "importaciones_internacionales_c_i_f",
   "impuestos_netos_de_subsidios_sobre_los_productos",
@@ -151,7 +153,8 @@ multipliers <- multipliers |>
 
 # ---- get gosh
 
-population <- read_tsv("data/population_2020.tsv") |>
-  left_join(state_mipbr, join_by(state))
 
 # ---- get employment
+
+population <- read_tsv(POPULATION) |>
+  left_join(state_mipbr, join_by(state))
