@@ -67,19 +67,42 @@ x_col <- colSums(Z_aug[, 1:N_SECTORS])
 are_xs_equal <- all(near(x_row, x_col, TOLERANCE))
 stopifnot("Row and Col totals do NOT match." = are_xs_equal)
 
-x <- x_row
-names(x) <- names(Z)
+x <- x_row |> set_names(names(Z))
 
 f <- Z_aug[1:N_SECTORS, -1:-N_SECTORS] |>
-  rowSums()
-names(f) <- names(Z)
+  rowSums() |>
+  set_names(names(Z))
 
 A <- get_A(Z, x)
 L <- get_L(A)
 
-print(L)
-
 # ---- get multipliers
+
+multipliers_vec <- colSums(L)
+are_not_less_than_1 <- all(multipliers_vec >= 1)
+stopifnot("Multipliers are less than 1." = are_not_less_than_1)
+
+multipliers <- tibble(
+  multiplier = multipliers_vec,
+  sector_raw = names(multipliers_vec)
+)
+
+naics <- multipliers$sector_raw |>
+  str_extract_all("\\d+") |>
+  map_chr(str_flatten, collapse = "-")
+
+sector <- multipliers$sector_raw |>
+  str_extract("\\d+.*?$") |>
+  str_remove_all("\\d+_")
+
+multipliers <- multipliers |>
+  mutate(
+    region = str_remove(sector_raw, "_\\d+.*$"),
+    code = naics,
+    sector = sector
+  ) |>
+  select(-sector_raw) |>
+  arrange(desc(multiplier))
 
 # ---- get model
 
