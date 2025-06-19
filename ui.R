@@ -1,6 +1,8 @@
 #!/usr/bin/Rscript
+library(tidyverse)
 library(shiny)
 library(shinydashboard)
+library(plotly)
 
 # User Interface
 ui <- dashboardPage(

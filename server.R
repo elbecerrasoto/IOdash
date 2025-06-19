@@ -50,7 +50,6 @@ server <- function(input, output, session) {
         aes(group = sector),  # Alinea con los grupos creados por fill
         position = position_dodge(width = 0.96),
         fill = "white", 
-        check_overlap = TRUE,
         fontface = "bold",
         size = 3,
         angle = 0,
