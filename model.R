@@ -15,6 +15,48 @@ EXTRA_ROWS <- c(
   "valor_agregado_bruto"
 )
 
+STATE_CODES <- c(
+  aguascalientes = "ags",
+  baja_california = "bc",
+  baja_california_sur = "bcs",
+  campeche = "camp",
+  coahuila = "coah",
+  colima = "col",
+  chiapas = "chis",
+  chihuahua = "chih",
+  ciudad_mexico = "cdmx",
+  durango = "dgo",
+  guanajuato = "gto",
+  guerrero = "gro",
+  hidalgo = "hgo",
+  jalisco = "jal",
+  estado_mexico = "mex",
+  morelos = "mor",
+  michoacan = "mich",
+  nayarit = "nay",
+  nuevo_leon = "nl",
+  oaxaca = "oax",
+  puebla = "pue",
+  queretaro = "qro",
+  quintana_roo = "qr",
+  san_luis_potosi = "slp",
+  sinaloa = "sin",
+  sonora = "son",
+  tabasco = "tab",
+  tamaulipas = "tamps",
+  tlaxcala = "tlax",
+  veracruz = "ver",
+  yucatan = "yuc",
+  zacatecas = "zac"
+)
+
+TSVs <- str_c("data/mip_ixi_br_", STATE_CODES, "_d_2018.tsv")
+state_mipbr <- tibble(
+  state = names(STATE_CODES),
+  code = STATE_CODES,
+  path = TSVs
+)
+
 # ---- helpers
 
 tib2mat <- function(tib, drop_names = FALSE) {
@@ -95,15 +137,21 @@ sector <- multipliers$sector_raw |>
   str_extract("\\d+.*?$") |>
   str_remove_all("\\d+_")
 
+region <- multipliers$sector_raw |>
+  str_remove("_\\d+.*$")
+
 multipliers <- multipliers |>
   mutate(
-    region = str_remove(sector_raw, "_\\d+.*$"),
+    region = region,
     code = naics,
     sector = sector
   ) |>
   select(-sector_raw) |>
   arrange(desc(multiplier))
 
-# ---- get model
+# ---- get gosh
 
-# ---- chaining
+population <- read_tsv("data/population_2020.tsv") |>
+  left_join(state_mipbr, join_by(state))
+
+# ---- get employment
