@@ -1,5 +1,5 @@
 #!/usr/bin/Rscript
-library(leontief) # Use it only to check correctness, and chaining
+library(leontief)
 library(tidyverse)
 library(glue)
 
@@ -104,6 +104,7 @@ get_L <- function(A) {
 
 Z_aug <- read_tsv(Z_AUG) |> select(where(is.numeric))
 Z <- Z_aug[1:N_SECTORS, 1:N_SECTORS]
+Zm <- tib2mat(Z, drop_names = TRUE)
 
 x_row <- rowSums(Z_aug[1:N_SECTORS, ])
 x_col <- colSums(Z_aug[, 1:N_SECTORS])
@@ -113,12 +114,16 @@ stopifnot("Row and Col totals do NOT match." = are_xs_equal)
 
 x <- x_row |> set_names(names(Z))
 
+# final demand
 f <- Z_aug[1:N_SECTORS, -1:-N_SECTORS] |>
   rowSums() |>
   set_names(names(Z))
 
 A <- get_A(Z, x)
+Am <- tib2mat(A, drop_names = TRUE)
+
 L <- get_L(A)
+Lm <- tib2mat(L, drop_names = TRUE)
 
 # ---- get multipliers
 
@@ -142,16 +147,15 @@ sector <- multipliers$sector_raw |>
 region <- multipliers$sector_raw |>
   str_remove("_\\d+.*$")
 
+# output multipliers
 multipliers <- multipliers |>
   mutate(
     region = region,
     code = naics,
     sector = sector
-  ) |>
-  select(-sector_raw) |>
-  arrange(desc(multiplier))
+  )
 
-# ---- get gosh
+# ---- expand multipliers to other summaries
 
 
 # ---- get employment
