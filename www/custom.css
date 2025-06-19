@@ -80,3 +80,43 @@
 .sidebar-menu li a {
   transition: all 0.3s ease !important;
 }
+
+/* ------------------------------------- */
+/* Estilos compactos para tablas DT      */
+/* ------------------------------------- */
+
+/* Encabezados de columna */
+table.dataTable thead th {
+  max-width: 150px !important;    /* Ancho máximo */
+  overflow: hidden !important; /* Oculta el texto desbordado */
+  text-overflow: ellipsis !important; /* Añade ... si el texto es largo */
+}
+
+/* Tooltip para texto completo */
+table.dataTable thead th.dt-compact:hover::after {
+  content: attr(title);
+  position: absolute;
+  background: #333;
+  color: white;
+  padding: 4px 8px;
+  border-radius: 3px;
+  font-size: 12px;
+  z-index: 10000;
+}
+
+/* Celdas del cuerpo */
+table.dataTable tbody td {
+  max-width: 150px !important;    /* Ancho máximo */
+}
+
+/* Cambiar el color del select */
+table.dataTable tbody > tr > td.selected {
+  background-color: #898AC4 !important;
+  border: 2px solid #898AC4 !important;
+  transition: all 0.3s ease;
+}
+
+/* Efecto hover */
+table.dataTable tbody > tr > td.selected:hover {
+  background-color: #898AC4 !important;
+}

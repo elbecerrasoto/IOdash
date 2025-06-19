@@ -30,12 +30,12 @@ ui <- dashboardPage(
         tabName = "summary",
         h2("Data Summary"),
         selectInput(
-          "states",
+          "state",
           "Select a State:",
           choices = setNames(states$corto, states$nombre), # Shows complete name, but uses short name
-          selected = "CDMX"
+          selected = "cdmx"
         ),
-        DTOutput("tabla_summary")
+        DTOutput("state_data")
       ),
 
       # Second tab: Simulator
@@ -72,6 +72,69 @@ server <- function(input, output, session) {
   matrix_L <- reactiveVal(NULL)
   sum_result <- reactiveVal(NULL)
 
+  # States data
+  state_data <- reactive({
+    req(input$state)
+    
+    # Find file with regex
+    pattern <- sprintf("mip_ixi_br_%s_d_\\d{4}\\.(tsv|xlsx)", input$state)
+    files <- list.files("data/", pattern = pattern, full.names = TRUE)
+    
+    if (length(files) == 0) {
+      showNotification("No file found for this State", type = "warning")
+      return(NULL)
+    }
+    
+    # Search for the most recent file
+    selected_file <- files[1] 
+    
+    # Read file by it's MIME
+    ext1 <- tools::file_ext(selected_file)
+    
+    tryCatch({
+      if (ext1 == "tsv") {
+        dfState <- read.delim(selected_file, na.strings = c("", "NA", "N/A"))
+      } else if (ext1 == "xlsx") {
+        dfState <- read_excel(selected_file, na = c("", "NA", "N/A"))
+      }
+      
+      # Limpieza segura de datos:
+      if (!is.null(dfState)) {
+        dfState <- dfState %>%
+          mutate(across(where(is.numeric), ~ ifelse(is.na(.), 0, .))) %>%
+          mutate(across(where(is.character), ~ ifelse(is.na(.), "", .)))
+      }
+      
+      return(dfState)
+    }, error = function(e) {
+      showNotification(paste("Error loading state data:", e$messageState), type = "error")
+      return(NULL)
+    })
+  })
+  
+  # Render table
+  output$state_data <- renderDT({
+    req(state_data())
+    datatable(
+      state_data(),
+      options = list(
+        scrollX = TRUE,
+        pageLength = 35,
+        language = list(search = "Search:"),
+        
+        # Give tooltip the title of the column
+        initComplete = JS("
+        function(settings, json) {
+          $('table.dataTable thead th').each(function() {
+            var title = $(this).text();
+            $(this).attr('title', title);
+          });
+        }
+      ")
+      )
+    )
+  })
+  
   # Data for summary
   datos <- reactive({
     data.frame(

@@ -1,33 +1,33 @@
 nombre,corto,clave,region
-Aguascalientes,Ags,AS,Centro Norte
-Baja California,BC,BC,Noroeste
-Baja California Sur,BCS,BS,Noroeste
-Campeche,Camp,CC,Península
-Chiapas,Chis,CS,Sur
-Chihuahua,Chih,CH,Norte
-Coahuila,Coah,CL,Norte
-Colima,Col,CM,Pacífico
-Ciudad de México,CDMX,DF,Centro
-Durango,Dgo,DG,Norte
-Guanajuato,Gto,GT,Centro
-Guerrero,Gro,GR,Pacífico
-Hidalgo,Hgo,HG,Centro
-Jalisco,Jal,JC,Pacífico
-México,Edomex,MC,Centro
-Michoacán,Mich,MN,Pacífico
-Morelos,Mor,MS,Centro
-Nayarit,Nay,NT,Pacífico
-Nuevo León,NL,NL,Noreste
-Oaxaca,Oax,OC,Sur
-Puebla,Pue,PL,Centro
-Querétaro,Qro,QT,Centro
-Quintana Roo,QR,QR,Península
-San Luis Potosí,SLP,SP,Centro Norte
-Sinaloa,Sin,SL,Noroeste
-Sonora,Son,SR,Noroeste
-Tabasco,Tab,TC,Sur
-Tamaulipas,Tamps,TS,Noreste
-Tlaxcala,Tlax,TL,Centro
-Veracruz,Ver,VZ,Este
-Yucatán,Yuc,YN,Península
-Zacatecas,Zac,ZS,Centro Norte
+Aguascalientes,ags,AS,Centro Norte
+Baja California,bc,BC,Noroeste
+Baja California Sur,bcs,BS,Noroeste
+Campeche,camp,CC,Península
+Chiapas,chis,CS,Sur
+Chihuahua,chih,CH,Norte
+Coahuila,coah,CL,Norte
+Colima,col,CM,Pacífico
+Ciudad de México,cdmx,DF,Centro
+Durango,dgo,DG,Norte
+Guanajuato,gto,GT,Centro
+Guerrero,gro,GR,Pacífico
+Hidalgo,hgo,HG,Centro
+Jalisco,jal,JC,Pacífico
+México,mex,MC,Centro
+Michoacán,mich,MN,Pacífico
+Morelos,mor,MS,Centro
+Nayarit,nay,NT,Pacífico
+Nuevo León,nl,NL,Noreste
+Oaxaca,oax,OC,Sur
+Puebla,pue,PL,Centro
+Querétaro,qro,QT,Centro
+Quintana Roo,qr,QR,Península
+San Luis Potosí,slp,SP,Centro Norte
+Sinaloa,sin,SL,Noroeste
+Sonora,son,SR,Noroeste
+Tabasco,tab,TC,Sur
+Tamaulipas,tamps,TS,Noreste
+Tlaxcala,tlax,TL,Centro
+Veracruz,ver,VZ,Este
+Yucatán,yuc,YN,Península
+Zacatecas,zac,ZS,Centro Norte
