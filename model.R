@@ -7,7 +7,7 @@ library(glue)
 
 TOLERANCE <- 1e-2
 N_SECTORS <- 35 * 2
-Z_AUG <- "data/mip_ixi_br_cdmx_d_2018.tsv"
+Z_AUG <- "data/mip_ixi_br_sin_d_2018.tsv"
 
 POPULATION <- "data/population_2020.tsv"
 
@@ -188,17 +188,15 @@ multipliers <- multipliers |>
   ) |>
   select(multiplier, link_class, sector, code, everything())
 
-# ---- get employment
-
-population <- read_tsv(POPULATION) |>
-  left_join(state_mipbr, join_by(state))
 
 # ---- production simulator
 
 production <- tibble(f_2018 = f, x_2018 = x, sector = multipliers$sector)
 
-simulate_demand_shock <-
-  function(shocks, f_old, x_old, shocks_are_multipliers = FALSE, shocks_are_total_demand = FALSE) {
+simulate_demand_shocks <-
+  function(shocks, x_old, f_old,
+           shocks_are_multipliers = FALSE,
+           shocks_are_total_demand = FALSE) {
     if (shocks_are_multipliers) {
       f_new <- shocks * f_old
     } else if (shocks_are_total_demand) {
@@ -206,14 +204,30 @@ simulate_demand_shock <-
     } else {
       f_new <- shocks + f_old
     }
+
     x_new <- Lm %*% f_new |> as.numeric()
     delta <- x_new - x_old
     delta_rel <-
       if_else(x_old != 0, (delta + x_old) / x_old, (delta + x_old) / 1)
+
     tibble(f_old, x_old, f_new, x_new, delta, delta_rel)
   }
 
-simulate_demand_shock(shocks, f, x)
+simulate_demand_shocks(rep(1.01, length(f)), x, f, shocks_are_multipliers = TRUE)
+
+# ---- get T
+
+population <- read_tsv(POPULATION) |>
+  left_join(state_mipbr, join_by(state))
+
+selected_population <- population |>
+  filter(path == Z_AUG) |>
+  pull(n)
+
+working_population <- 0.46 * selected_population
+employment_struture <- rep(1 / N_SECTORS, N_SECTORS)
+
+e <- working_population * employment_struture
 
 
 # ---- employment simulator
