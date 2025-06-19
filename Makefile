@@ -1,6 +1,6 @@
 .PHONY all:
 all:
-	Rscript populate
+	Rscript populate.R
 
 .PHONY help:
 help:
@@ -17,6 +17,6 @@ style:
 
 .PHONY clean:
 clean:
-	rm -f data
+	rm -rf data
 
 

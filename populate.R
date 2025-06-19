@@ -6,7 +6,7 @@ source("clean.R")
 
 # ---- globals
 
-DOWNLOAD <- FALSE
+DOWNLOAD <- TRUE
 STEM <- "https://www.inegi.org.mx/contenidos/investigacion/coumip/tabulados"
 
 DATA_DIR <- "data"
@@ -67,7 +67,7 @@ main <- function(i) {
   url_i <- URLs[[i]]
   tsv_i <- TSVs[[i]]
 
-  xlsx_i <- get_xlsx(url_i, DATA_DIR, dry = DOWNLOAD)
+  xlsx_i <- get_xlsx(url_i, DATA_DIR, download = DOWNLOAD)
 
   clean_mipbr_xlsx(xlsx_i) |>
     write_tsv(tsv_i)

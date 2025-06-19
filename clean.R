@@ -4,7 +4,9 @@ library(janitor)
 library(readxl)
 library(glue)
 
-DEVELOP <- TRUE
+DEVELOP <- FALSE
+TOLERANCE <- 1e-2 # It was found by trial and error
+N_SECTORS <- 35 * 2 # 35 industries, state and rest of the country
 
 clean_mipbr_xlsx <- function(xlsx) {
   if (!file.exists(xlsx)) {
@@ -39,8 +41,8 @@ clean_mipbr_xlsx <- function(xlsx) {
   rk1[is.na(rk1)] <- ""
   rk2[is.na(rk2)] <- ""
 
-  row_keys <- str_c(rk1, " ::: ", rk2)
-  col_keys <- str_c(ck5, " ::: ", ck6)
+  row_keys <- str_c(rk1, "_", rk2) |> make_clean_names()
+  col_keys <- str_c(ck5, "_", ck6) |> make_clean_names()
 
   # Remove the first 6 rows
   mip_br <- mip_br |> slice(-1:-6)
@@ -59,8 +61,23 @@ clean_mipbr_xlsx <- function(xlsx) {
 
   # Input 0 on any NA cell
   # and then write into a tsv
-  mip_br |>
+  mip_br <- mip_br |>
     mutate(across(everything(), ~ replace_na(.x, 0)))
+
+  col_sum <- mip_br[, 1:N_SECTORS] |>
+    select(where(is.numeric)) |>
+    colSums()
+
+  row_sum <- mip_br[1:N_SECTORS, ] |>
+    select(where(is.numeric)) |>
+    rowSums()
+
+  is_accounting_good <- near(row_sum, col_sum, tol = TOLERANCE) |> all()
+  if (!is_accounting_good) {
+    stop(glue("Colum Sum and Row Sum are not equal.\nUsing {N_SECTORS} sectors.\nAt a tolerance of {TOLERANCE}"))
+  }
+
+  mip_br
 }
 
 get_xlsx <- function(url, dir, download = TRUE) {
@@ -75,7 +92,7 @@ get_xlsx <- function(url, dir, download = TRUE) {
 }
 
 if (DEVELOP) {
-  DOWLOAD <- FALSE
+  DOWLOAD <- TRUE
   NAME <- "mip_ixi_br_sin_d_2018"
   DIR <- "data"
 
