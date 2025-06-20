@@ -9,56 +9,6 @@ TOLERANCE <- 1e-2
 N_SECTORS <- 35 * 2
 Z_AUG <- "data/mip_ixi_br_sin_d_2018.tsv"
 
-POPULATION <- "data/population_2020.tsv"
-
-EXTRA_ROWS <- c(
-  "importaciones_internacionales_c_i_f",
-  "impuestos_netos_de_subsidios_sobre_los_productos",
-  "valor_agregado_bruto"
-)
-
-STATE_CODES <- c(
-  aguascalientes = "ags",
-  baja_california = "bc",
-  baja_california_sur = "bcs",
-  campeche = "camp",
-  coahuila = "coah",
-  colima = "col",
-  chiapas = "chis",
-  chihuahua = "chih",
-  ciudad_mexico = "cdmx",
-  durango = "dgo",
-  guanajuato = "gto",
-  guerrero = "gro",
-  hidalgo = "hgo",
-  jalisco = "jal",
-  estado_mexico = "mex",
-  morelos = "mor",
-  michoacan = "mich",
-  nayarit = "nay",
-  nuevo_leon = "nl",
-  oaxaca = "oax",
-  puebla = "pue",
-  queretaro = "qro",
-  quintana_roo = "qr",
-  san_luis_potosi = "slp",
-  sinaloa = "sin",
-  sonora = "son",
-  tabasco = "tab",
-  tamaulipas = "tamps",
-  tlaxcala = "tlax",
-  veracruz = "ver",
-  yucatan = "yuc",
-  zacatecas = "zac"
-)
-
-TSVs <- str_c("data/mip_ixi_br_", STATE_CODES, "_d_2018.tsv")
-state_mipbr <- tibble(
-  state = names(STATE_CODES),
-  code = STATE_CODES,
-  path = TSVs
-)
-
 # ---- helpers
 
 tib2mat <- function(tib, drop_names = FALSE) {
@@ -187,46 +137,3 @@ multipliers <- multipliers |>
     link_class = link_class
   ) |>
   select(multiplier, link_class, sector, code, everything())
-
-# ---- production simulator
-
-production <- tibble(f_2018 = f, x_2018 = x, sector = multipliers$sector)
-
-simulate_demand_shocks <-
-  function(shocks, x_old, f_old,
-           shocks_are_multipliers = FALSE,
-           shocks_are_total_demand = FALSE) {
-    if (shocks_are_multipliers) {
-      f_new <- shocks * f_old
-    } else if (shocks_are_total_demand) {
-      f_new <- shocks
-    } else {
-      f_new <- shocks + f_old
-    }
-
-    x_new <- Lm %*% f_new |> as.numeric()
-    delta <- x_new - x_old
-    delta_rel <-
-      if_else(x_old != 0, (delta + x_old) / x_old, (delta + x_old) / 1)
-
-    tibble(f_old, x_old, f_new, x_new, delta, delta_rel)
-  }
-
-simulate_demand_shocks(rep(1.01, length(f)), x, f, shocks_are_multipliers = TRUE)
-
-# ---- get T
-
-population <- read_tsv(POPULATION) |>
-  left_join(state_mipbr, join_by(state))
-
-selected_population <- population |>
-  filter(path == Z_AUG) |>
-  pull(n)
-
-working_population <- 0.46 * selected_population
-employment_struture <- rep(1 / N_SECTORS, N_SECTORS)
-
-e <- working_population * employment_struture
-
-
-# ---- employment simulator
