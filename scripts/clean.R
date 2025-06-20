@@ -103,3 +103,39 @@ if (DEVELOP) {
   xlsx <- get_xlsx(URL, DIR, download = DOWLOAD)
   mipbr <- clean_mipbr_xlsx(xlsx)
 }
+
+
+STATE_CODES <- c(
+  aguascalientes = "ags",
+  baja_california = "bc",
+  baja_california_sur = "bcs",
+  campeche = "camp",
+  coahuila = "coah",
+  colima = "col",
+  chiapas = "chis",
+  chihuahua = "chih",
+  ciudad_mexico = "cdmx",
+  durango = "dgo",
+  guanajuato = "gto",
+  guerrero = "gro",
+  hidalgo = "hgo",
+  jalisco = "jal",
+  estado_mexico = "mex",
+  morelos = "mor",
+  michoacan = "mich",
+  nayarit = "nay",
+  nuevo_leon = "nl",
+  oaxaca = "oax",
+  puebla = "pue",
+  queretaro = "qro",
+  quintana_roo = "qr",
+  san_luis_potosi = "slp",
+  sinaloa = "sin",
+  sonora = "son",
+  tabasco = "tab",
+  tamaulipas = "tamps",
+  tlaxcala = "tlax",
+  veracruz = "ver",
+  yucatan = "yuc",
+  zacatecas = "zac"
+)
