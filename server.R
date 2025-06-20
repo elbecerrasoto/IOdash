@@ -14,23 +14,22 @@ server <- function(input, output, session) {
   matrix_L <- reactiveVal(NULL)
   sum_result <- reactiveVal(NULL)
 
-#:::::::::::::::::::::::::::::: TAB 1 ::::::::::::::::::::::::::::::::::::::::::
-  
+  # :::::::::::::::::::::::::::::: TAB 1 ::::::::::::::::::::::::::::::::::::::::::
+
   # Render a barplot
   output$multiplier_plot <- renderPlot({
-    
     # Order
-    multi <- multi %>% 
+    multi <- multi %>%
       arrange(desc(multi)) %>%
       mutate(sector = factor(sector, levels = unique(sector)))
-    
+
     # Reduce sector label
     # multi$sector <- str_trunc(multi$sector, 25, side = "right")
-    multi$sector <-  substr(multi$sector, start = 0, stop = 40)
-    
+    multi$sector <- substr(multi$sector, start = 0, stop = 40)
+
     # Graph
     ggplot(multi, aes(
-      x = region, 
+      x = region,
       y = multiplier,
       fill = sector,
       label = round(multiplier, 2)
@@ -39,7 +38,7 @@ server <- function(input, output, session) {
       # geom_label(
       #   position = position_dodge(width = 0.96),
       #   fill = "white"
-      #   vjust = -0.9, 
+      #   vjust = -0.9,
       #   check_overlap = TRUE,
       #   fontface = "bold",
       #   size = 3,
@@ -47,9 +46,9 @@ server <- function(input, output, session) {
       #   color = "black",
       # )
       geom_label_repel(
-        aes(group = sector),  # Alinea con los grupos creados por fill
+        aes(group = sector), # Alinea con los grupos creados por fill
         position = position_dodge(width = 0.96),
-        fill = "white", 
+        fill = "white",
         fontface = "bold",
         size = 3,
         angle = 0,
@@ -63,7 +62,7 @@ server <- function(input, output, session) {
       ) +
       theme_minimal() +
       theme(
-        axis.text.x = element_text(angle = 45, hjust = 1),  
+        axis.text.x = element_text(angle = 45, hjust = 1),
         legend.position = "bottom",
         plot.title = element_text(hjust = 0.5, face = "bold")
       ) +
@@ -76,43 +75,46 @@ server <- function(input, output, session) {
   # States data
   state_data <- reactive({
     req(input$state)
-    
+
     # Find file with regex
     pattern <- sprintf("mip_ixi_br_%s_d_\\d{4}\\.(tsv|xlsx)", input$state)
     files <- list.files("data/", pattern = pattern, full.names = TRUE)
-    
+
     if (length(files) == 0) {
       showNotification("No file found for this State", type = "warning")
       return(NULL)
     }
-    
+
     # Search for the most recent file
-    selected_file <- files[1] 
-    
+    selected_file <- files[1]
+
     # Read file by it's MIME
     ext1 <- tools::file_ext(selected_file)
-    
-    tryCatch({
-      if (ext1 == "tsv") {
-        dfState <- read.delim(selected_file, na.strings = c("", "NA", "N/A"))
-      } else if (ext1 == "xlsx") {
-        dfState <- read_excel(selected_file, na = c("", "NA", "N/A"))
+
+    tryCatch(
+      {
+        if (ext1 == "tsv") {
+          dfState <- read.delim(selected_file, na.strings = c("", "NA", "N/A"))
+        } else if (ext1 == "xlsx") {
+          dfState <- read_excel(selected_file, na = c("", "NA", "N/A"))
+        }
+
+        # Limpieza segura de datos:
+        if (!is.null(dfState)) {
+          dfState <- dfState %>%
+            mutate(across(where(is.numeric), ~ ifelse(is.na(.), 0, .))) %>%
+            mutate(across(where(is.character), ~ ifelse(is.na(.), "", .)))
+        }
+
+        return(dfState)
+      },
+      error = function(e) {
+        showNotification(paste("Error loading state data:", e$messageState), type = "error")
+        return(NULL)
       }
-      
-      # Limpieza segura de datos:
-      if (!is.null(dfState)) {
-        dfState <- dfState %>%
-          mutate(across(where(is.numeric), ~ ifelse(is.na(.), 0, .))) %>%
-          mutate(across(where(is.character), ~ ifelse(is.na(.), "", .)))
-      }
-      
-      return(dfState)
-    }, error = function(e) {
-      showNotification(paste("Error loading state data:", e$messageState), type = "error")
-      return(NULL)
-    })
+    )
   })
-  
+
   # Render state table
   output$state_data <- renderDT({
     req(state_data())
@@ -122,7 +124,7 @@ server <- function(input, output, session) {
         scrollX = TRUE,
         pageLength = 35,
         language = list(search = "Search:"),
-        
+
         # Give tooltip the title of the column
         initComplete = JS("
         function(settings, json) {
@@ -135,7 +137,7 @@ server <- function(input, output, session) {
       )
     )
   })
-  
+
   # Data for summary
   datos <- reactive({
     data.frame(
@@ -149,28 +151,28 @@ server <- function(input, output, session) {
     datatable(datos())
   })
 
-#:::::::::::::::::::::::::::::: TAB 2 ::::::::::::::::::::::::::::::::::::::::::
-  
+  # :::::::::::::::::::::::::::::: TAB 2 ::::::::::::::::::::::::::::::::::::::::::
+
   # Show titles only if file is TRUE
   output$h3UpData <- renderUI({
-    req(input$uploadFile)  
+    req(input$uploadFile)
     h3("Uploaded Data")
   })
-  
+
   output$sumMatL <- renderUI({
-    req(matrix_L())  
+    req(matrix_L())
     h3("Sum Matrix (L)")
   })
-  
-  #Show actionButton 
+
+  # Show actionButton
   output$buttonCalc <- renderUI({
-    req(input$uploadFile)  # Solo continua si hay archivo
+    req(input$uploadFile) # Solo continua si hay archivo
     div(
       style = "margin-top: 25px;",
       actionButton("calcule", "Calculate matrix")
     )
   })
-  
+
   # Handle file upload
   observeEvent(input$uploadFile, {
     req(input$uploadFile)
@@ -224,8 +226,8 @@ server <- function(input, output, session) {
     datatable(matrix_L(), options = list(scrollX = TRUE))
   })
 
-#:::::::::::::::::::::::::::::: TAB 3 ::::::::::::::::::::::::::::::::::::::::::
-  
+  # :::::::::::::::::::::::::::::: TAB 3 ::::::::::::::::::::::::::::::::::::::::::
+
   # Explore tab
   output$heatmap <- renderPlotly({
     req(matrix_L())

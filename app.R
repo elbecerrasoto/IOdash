@@ -1,5 +1,5 @@
 # Carga librerías y recursos
-source("global.R", local = TRUE)  # Opcional para código compartido
+source("global.R", local = TRUE) # Opcional para código compartido
 
 # Ejecuta la app
 shinyApp(

@@ -27,7 +27,7 @@ ui <- dashboardPage(
         h3("Análisis de Multiplicadores"),
         box(
           width = 12,
-          plotOutput("multiplier_plot", height = "700px")  # Custom height
+          plotOutput("multiplier_plot", height = "700px") # Custom height
         ),
         selectInput(
           "state",
@@ -44,19 +44,19 @@ ui <- dashboardPage(
         h2("Simulator"),
         fluidRow(
           column(
-            width = 4, 
+            width = 4,
             fileInput(
-              "uploadFile", 
+              "uploadFile",
               "Upload TSV file",
               accept = c(".tsv", "text/tsv", ".xlsx"),
               buttonLabel = "Upload..."
             )
           ),
           column(
-            width = 4, 
+            width = 4,
             div(
               style = "margin-top: 25px;",
-              uiOutput("buttonCalc") 
+              uiOutput("buttonCalc")
             )
           )
         ),
