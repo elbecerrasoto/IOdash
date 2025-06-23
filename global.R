@@ -1,9 +1,7 @@
 library(tidyverse)
 library(shiny)
 library(shinydashboard)
-library(readr)
 library(rlang)
-library(dplyr)
 
 # Load all data files at once
 data_files <- list(
@@ -11,6 +9,8 @@ data_files <- list(
   multiplier = read_tsv("data/multiplier_cdmx.tsv"),
   mips_data = read_rds("data/mipsBR.Rds")
 )
+
+MIPS_BR <- data_files$mips_data
 
 # Process states data in a single pipeline
 STATES_CSV <- data_files$states %>%

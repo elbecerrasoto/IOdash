@@ -8,7 +8,7 @@ library(igraph)
 library(heatmaply)
 library(viridis)
 library(writexl)
-source("./scripts/simulator.R")
+source("simulator.R")
 
 
 server <- function(input, output, session) {
