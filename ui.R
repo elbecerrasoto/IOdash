@@ -16,7 +16,7 @@ ui <- fluidPage(
   ),
 
   # Application title
-  titlePanel("IO Dashboard"),
+  titlePanel("Input Output Economic Models for Mexico"),
 
   # Main panel with tabs
   tabsetPanel(
