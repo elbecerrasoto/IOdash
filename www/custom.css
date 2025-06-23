@@ -2,7 +2,6 @@
 .tabbable {
   background-color: #ffffff;
   color: #000000;
-  height: 100vh;
 }
 
 /* Pestañas inactivas */
@@ -129,3 +128,88 @@ table.dataTable tbody > tr > td.selected:hover {
 }
 
 /* ========== LAYOUT ELEMENTS ========== */
+
+/* Estilos para los valueBox */
+.small-box {
+  padding: 5px;
+  color: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  transition: all 0.3s ease;
+  border-left: 4px solid transparent;
+}
+
+.small-box:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+}
+
+/* Colores personalizados para cada box */
+.bg-purple {  /* GDP State */
+  background-color: #898AC4 !important;
+  border-left-color: #3d3e7d !important;
+  color: white;
+}
+
+.bg-aqua {  /* GDP State */
+  background-color: #3498db !important;
+  border-left-color: #34495e !important;
+}
+
+.bg-blue {  /* GDP Rest */
+  background-color: #2980b9 !important;
+  border-left-color: #34495e !important;
+}
+
+.bg-green {  /* Employment State */
+  background-color: #84AE92 !important;
+  border-left-color: #5A827E !important;
+}
+
+.bg-yellow {  /* Employment Rest */
+  background-color: #E9A319 !important;
+  border-left-color: #A86523 !important;
+}
+
+/* Contenido interno */
+.small-box h3 {
+  font-size: 2.2rem;
+  font-weight: 700;
+  margin-bottom: 5px;
+}
+
+.small-box p {
+  font-size: 1rem;
+  opacity: 0.9;
+}
+
+/* Estilo personalizado para los iconos */
+.value-box-icon-custom {
+  position: absolute !important;
+  right: 15px !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+  font-size: 80px !important;  /* Tamaño más grande */
+  opacity: 0.15 !important;    /* Transparencia para que no compita con el texto */
+  z-index: 0 !important;       /* Coloca el icono detrás del texto */
+  color: #ffffff !important;   /* Color base (blanco) */
+}
+
+/* Colores específicos para cada icono */
+.icon-gdp-state { color: #3d3e7d !important; }
+.icon-gdp-rest { color: #34495e !important; }
+.icon-emp-state { color: #5A827E !important; }
+.icon-emp-rest { color: #A86523 !important; }
+
+/* Contenedor del valueBox con posición relativa */
+.small-box .inner {
+  position: relative;
+  z-index: 1;  /* Asegura que el texto esté sobre el icono */
+}
+
+/* Efecto para pantallas pequeñas */
+@media (max-width: 768px) {
+  .small-box {
+    margin-bottom: 20px;
+  }
+}

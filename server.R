@@ -10,6 +10,7 @@ library(viridis)
 library(writexl)
 source("./scripts/simulator.R")
 
+
 server <- function(input, output, session) {
   # Reactive value to store uploaded data
   Z_aug <- reactive(MIPS_BR[[input$state]])
@@ -41,7 +42,7 @@ server <- function(input, output, session) {
     h2("Multipliers")
   })
 
-  debug_values <- reactiveValues(multi_data = NULL)
+  # debug_values <- reactiveValues(multi_data = NULL)
 
   # Render a barplot
   output$multiplier_plot <- renderPlot({
@@ -59,8 +60,8 @@ server <- function(input, output, session) {
       mutate(sector = factor(sector, levels = unique(sector)))
 
     # Debug errors
-    debug_values$multi_data <- multi
-    print(head(debug_values$multi_data))
+    # debug_values$multi_data <- multi
+    # print(head(debug_values$multi_data))
 
     # Graph
     ggplot(multi, aes(
@@ -270,7 +271,234 @@ server <- function(input, output, session) {
     datatable(matrix_L(), options = list(scrollX = TRUE))
   })
 
-  # :::::::::::::::::::::::::::::: TAB 3 ::::::::::::::::::::::::::::::::::::::::::
+  # ::::::::::::::::::::: TAB 3  PRODUCTION SIM ::::::::::::::::::::::::::::::::::
+
+  # Static values for valueBox
+  output$gdp_state_box <- renderValueBox({
+    valueBox(
+      value = "1.1",
+      subtitle = "GDP State (millions)",
+      icon = icon("landmark", lib = "font-awesome"),
+      color = "purple"
+    )
+  })
+
+  output$gdp_rest_box <- renderValueBox({
+    valueBox(
+      value = "12.4",
+      subtitle = "GDP Rest (millions)",
+      icon = icon("globe-americas", lib = "font-awesome"),
+      color = "blue" # bg-blue en CSS
+    )
+  })
+
+  output$employment_state_box <- renderValueBox({
+    valueBox(
+      value = "45",
+      subtitle = "Employment State (thousands)",
+      icon = icon("industry", lib = "font-awesome"),
+      color = "green" # bg-green en CSS
+    )
+  })
+
+  output$employment_rest_box <- renderValueBox({
+    valueBox(
+      value = "12.2",
+      subtitle = "Employment Rest (thousands)",
+      icon = icon("users", lib = "font-awesome"),
+      color = "yellow"
+    )
+  })
+
+  # Row number
+  n_rows <- 70
+
+  # Generate input table
+  output$input_table <- renderUI({
+    # Dividimos los inputs en dos grupos
+    primera_mitad <- lapply(1:35, function(i) {
+      splitLayout(
+        cellWidths = c("30%", "70%"),
+        tags$div(paste("Sector", i), style = "text-align: right; padding-right: 10px;"),
+        numericInput(
+          inputId = paste0("input_", i),
+          label = NULL,
+          value = 1,
+          width = "100%"
+        )
+      )
+    })
+
+    segunda_mitad <- lapply(36:70, function(i) {
+      splitLayout(
+        cellWidths = c("30%", "70%"),
+        tags$div(paste("Sector", i), style = "text-align: right; padding-right: 10px;"),
+        numericInput(
+          inputId = paste0("input_", i),
+          label = NULL,
+          value = 1,
+          width = "100%"
+        )
+      )
+    })
+
+    # Creamos dos columnas
+    fluidRow(
+      column(6, do.call(tagList, primera_mitad)),
+      column(6, do.call(tagList, segunda_mitad))
+    )
+  })
+
+  # Fill all inputs
+  observeEvent(input$fill_all, {
+    if (!is.na(input$fill_value)) {
+      for (i in 1:n_rows) {
+        updateNumericInput(
+          session,
+          inputId = paste0("input_", i),
+          value = input$fill_value
+        )
+      }
+    }
+  })
+
+  # Get all the values
+  observeEvent(input$get_values, {
+    values <- sapply(1:n_rows, function(i) {
+      val <- input[[paste0("input_", i)]]
+      if (is.na(val)) 1 else val
+    })
+
+    # Values summary
+    output$value_output <- renderPrint({
+      cat("Values:\n")
+      print(values)
+      cat("\nSummary:\n")
+      cat("AVG:", mean(values, na.rm = TRUE), "\n")
+      cat("Total:", sum(values, na.rm = TRUE))
+    })
+  })
+
+  # ::::::::::::::::::::: TAB 4  EMPLOYMENT SIM ::::::::::::::::::::::::::::::::::
+
+  # Static values for valueBox
+  output$gdp_state_box_2 <- renderValueBox({
+    valueBox(
+      value = "1.3",
+      subtitle = "GDP State (millions)",
+      icon = icon("landmark", lib = "font-awesome"),
+      color = "purple"
+    )
+  })
+
+  output$gdp_rest_box_2 <- renderValueBox({
+    valueBox(
+      value = "13.4",
+      subtitle = "GDP Rest (millions)",
+      icon = icon("globe-americas", lib = "font-awesome"),
+      color = "blue" # bg-blue en CSS
+    )
+  })
+
+  output$employment_state_box_2 <- renderValueBox({
+    valueBox(
+      value = "1.2",
+      subtitle = "Employment State (thousands)",
+      icon = icon("industry", lib = "font-awesome"),
+      color = "green" # bg-green en CSS
+    )
+  })
+
+  output$employment_rest_box_2 <- renderValueBox({
+    valueBox(
+      value = "0.2",
+      subtitle = "Employment Rest (thousands)",
+      icon = icon("users", lib = "font-awesome"),
+      color = "yellow"
+    )
+  })
+
+  # Corrected and standardized version with English comments
+
+  # Define number of rows for employment section
+  n_rows_employment <- 70 # Using more descriptive name than n_rows_2
+
+  # Generate interactive input table for employment values
+  output$input_table_employment <- renderUI({
+    # Dividimos los inputs en dos grupos
+    primera_mitad <- lapply(1:35, function(i) {
+      splitLayout(
+        cellWidths = c("30%", "70%"), # 30% para label, 70% para input
+        tags$div(paste("Sector", i),
+          style = "text-align: right; padding-right: 10px; padding-top: 5px;"
+        ),
+        numericInput(
+          inputId = paste0("employment_input_", i),
+          label = NULL, # Eliminamos el label ya que lo ponemos manualmente
+          value = 1,
+          width = "100%",
+          min = 0 # Aseguramos que employment no sea negativo
+        )
+      )
+    })
+
+    segunda_mitad <- lapply(36:70, function(i) {
+      splitLayout(
+        cellWidths = c("30%", "70%"),
+        tags$div(paste("Sector", i),
+          style = "text-align: right; padding-right: 10px; padding-top: 5px;"
+        ),
+        numericInput(
+          inputId = paste0("employment_input_", i),
+          label = NULL,
+          value = 1,
+          width = "100%",
+          min = 0
+        )
+      )
+    })
+
+    # Creamos dos columnas dentro de un fluidRow
+    fluidRow(
+      column(6, do.call(tagList, primera_mitad)),
+      column(6, do.call(tagList, segunda_mitad)),
+      style = "margin-top: 10px;" # Espacio arriba
+    )
+  })
+
+  # Handle "Fill All" functionality for employment section
+  observeEvent(input$fill_all_employment, {
+    if (!is.na(input$fill_value_employment)) {
+      for (i in 1:n_rows_employment) {
+        updateNumericInput(
+          session,
+          inputId = paste0("employment_input_", i),
+          value = input$fill_value_employment
+        )
+      }
+    }
+  })
+
+  # Process and display employment values
+  observeEvent(input$get_values_employment, {
+    employment_values <- sapply(1:n_rows_employment, function(i) {
+      employment_val <- input[[paste0("employment_input_", i)]] # Get each input value
+      if (is.na(employment_val)) 1 else employment_val # Replace NA with 1
+    })
+
+    p(employment_values)
+
+    # Enhanced output display
+    output$employment_values_output <- renderPrint({
+      cat("Values:\n")
+      print(employment_values)
+      cat("\nSummary:\n")
+      cat("AVG:", mean(employment_values, na.rm = TRUE), "\n")
+      cat("Total:", sum(employment_values, na.rm = TRUE))
+    })
+  })
+
+  # ::::::::::::::::::::: TAB 5  EXPLORE ::::::::::::::::::::::::::::::::::
 
   # Explore tab
   output$heatmap <- renderPlotly({
