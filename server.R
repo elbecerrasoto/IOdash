@@ -4,12 +4,54 @@ library(shiny)
 library(shinydashboard)
 library(DT)
 library(ggrepel)
-library(igraph)
-library(heatmaply)
 library(viridis)
 library(writexl)
 source("simulator.R")
 
+# ---- helpers
+
+make_bar_multipliers <- function(multi) {
+  # Graph
+  ggplot(multi, aes(
+    x = region,
+    y = multiplier,
+    fill = sector,
+    label = round(multiplier, 2)
+  )) +
+    geom_bar(stat = "identity", position = position_dodge(width = 0.96)) +
+    geom_label_repel(
+      aes(group = sector), # Alinea con los grupos creados por fill
+      position = position_dodge(width = 0.96),
+      fill = "white",
+      fontface = "bold",
+      size = 3,
+      angle = 0,
+      color = "black"
+    ) +
+    labs(
+      title = "Multiplicadores Económicos por Región y Sector",
+      x = "Región",
+      y = "Valor del Multiplicador",
+      fill = "Sector"
+    ) +
+    theme_minimal() +
+    theme(
+      axis.text.x = element_text(angle = 45, hjust = 1),
+      legend.position = "bottom",
+      plot.margin = margin(t = 20, r = 10, b = 40, l = 10, unit = "pt"), # Ajuste clave
+      plot.title = element_text(
+        hjust = 0.5,
+        face = "bold",
+        margin = margin(b = 20) # Espacio bajo el título
+      ),
+    ) +
+    guides(
+      fill = guide_legend(ncol = 4, nrow = 10)
+    ) +
+    scale_fill_viridis_d(option = "G")
+}
+
+# ---- server
 
 server <- function(input, output, session) {
   # Reactive value to store uploaded data
@@ -64,43 +106,7 @@ server <- function(input, output, session) {
     # print(head(debug_values$multi_data))
 
     # Graph
-    ggplot(multi, aes(
-      x = region,
-      y = multiplier,
-      fill = sector,
-      label = round(multiplier, 2)
-    )) +
-      geom_bar(stat = "identity", position = position_dodge(width = 0.96)) +
-      geom_label_repel(
-        aes(group = sector), # Alinea con los grupos creados por fill
-        position = position_dodge(width = 0.96),
-        fill = "white",
-        fontface = "bold",
-        size = 3,
-        angle = 0,
-        color = "black"
-      ) +
-      labs(
-        title = "Multiplicadores Económicos por Región y Sector",
-        x = "Región",
-        y = "Valor del Multiplicador",
-        fill = "Sector"
-      ) +
-      theme_minimal() +
-      theme(
-        axis.text.x = element_text(angle = 45, hjust = 1),
-        legend.position = "bottom",
-        plot.margin = margin(t = 20, r = 10, b = 40, l = 10, unit = "pt"), # Ajuste clave
-        plot.title = element_text(
-          hjust = 0.5,
-          face = "bold",
-          margin = margin(b = 20) # Espacio bajo el título
-        ),
-      ) +
-      guides(
-        fill = guide_legend(ncol = 4, nrow = 10)
-      ) +
-      scale_fill_viridis_d(option = "G")
+    make_bar_multipliers(multi)
   })
 
 
