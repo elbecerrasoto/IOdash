@@ -23,28 +23,16 @@ ui <- fluidPage(
     id = "mainTabs",
     type = "tabs",
 
-    # First tab: Welcome
+    # Second tab: Summary
     tabPanel(
-      "Home",
-      h2("Welcome"),
-      p("This is a simulator"),
-      p("1. Before exploring the economic multipliers or running simulations, please select your state of interest:"),
+      "Mulitpliers",
+      uiOutput("summary_header"), # Dynamic header
       selectInput(
         "state",
         "Select a State:",
         choices = setNames(STATES_CSV$id, STATES_CSV$fullname), # Shows full name but uses short name
         selected = "ciudad_mexico"
       ),
-      p("2. Increase on final demand by sector:"),
-      sliderInput("shock_multiplier", "Multiply by this amount",
-        value = 1.01, min = 0.50, max = 2.00
-      ),
-    ),
-
-    # Second tab: Summary
-    tabPanel(
-      "Summary",
-      uiOutput("summary_header"), # Dynamic header
       h3("Multiplier Analysis"),
       box(
         width = 12,
