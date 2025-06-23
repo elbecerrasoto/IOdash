@@ -1,33 +1,33 @@
-nombre,corto,clave,region
-Aguascalientes,ags,AS,Centro Norte
-Baja California,bc,BC,Noroeste
-Baja California Sur,bcs,BS,Noroeste
-Campeche,camp,CC,Península
-Chiapas,chis,CS,Sur
-Chihuahua,chih,CH,Norte
-Coahuila,coah,CL,Norte
-Colima,col,CM,Pacífico
-Ciudad de México,cdmx,DF,Centro
-Durango,dgo,DG,Norte
-Guanajuato,gto,GT,Centro
-Guerrero,gro,GR,Pacífico
-Hidalgo,hgo,HG,Centro
-Jalisco,jal,JC,Pacífico
-México,mex,MC,Centro
-Michoacán,mich,MN,Pacífico
-Morelos,mor,MS,Centro
-Nayarit,nay,NT,Pacífico
-Nuevo León,nl,NL,Noreste
-Oaxaca,oax,OC,Sur
-Puebla,pue,PL,Centro
-Querétaro,qro,QT,Centro
-Quintana Roo,qr,QR,Península
-San Luis Potosí,slp,SP,Centro Norte
-Sinaloa,sin,SL,Noroeste
-Sonora,son,SR,Noroeste
-Tabasco,tab,TC,Sur
-Tamaulipas,tamps,TS,Noreste
-Tlaxcala,tlax,TL,Centro
-Veracruz,ver,VZ,Este
-Yucatán,yuc,YN,Península
-Zacatecas,zac,ZS,Centro Norte
+fullname,shortname
+Aguascalientes,ags
+Baja California,bc
+Baja California Sur,bcs
+Campeche,camp
+Coahuila,coah
+Colima,col
+Chiapas,chis
+Chihuahua,chih
+Ciudad de México,cdmx
+Durango,dgo
+Guanajuato,gto
+Guerrero,gro
+Hidalgo,hgo
+Jalisco,jal
+Estado de México,mex
+Morelos,mor
+Michoacán,mich
+Nayarit,nay
+Nuevo León,nl
+Oaxaca,oax
+Puebla,pue
+Querétaro,qro
+Quintana Roo,qr
+San Luis Potosí,slp
+Sinaloa,sin
+Sonora,son
+Tabasco,tab
+Tamaulipas,tamps
+Tlaxcala,tlax
+Veracruz,ver
+Yucatán,yuc
+Zacatecas,zac

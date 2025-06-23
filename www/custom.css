@@ -1,122 +1,131 @@
-/* Change header background and text color */
-.skin-blue .main-header .navbar {
-  background-color: #898AC4 !important;  
+/* Contenedor principal */
+.tabbable {
+  background-color: #ffffff;
+  color: #000000;
+  height: 100vh;
 }
 
-/* Change hover color for header items */
-.skin-blue .main-header .navbar .sidebar-toggle:hover {
-  background-color: #4d4e99 !important;
-}
-
-/* Style the logo area (left side of header) */
-.skin-blue .main-header .logo {
-  background-color: #4d4e99 !important;
-  color: #FFFFFF !important;
-  font-weight: bold;
-}
-
-/* Change logo on hover */
-.skin-blue .main-header .logo:hover {
-  background-color: #4d4e99 !important;
-}
-
-/* Customize title styling */
-.main-header .logo .navbar-custom-menu {
+/* Pestañas inactivas */
+.tabbable > .nav > li > a {
+  background-color: #2C3E50;
+  color: white;
+  border: 1px solid #1A242F !important;
+  margin-right: 5px;
+  border-radius: 5px 5px 0 0;
   font-family: 'Arial', sans-serif;
-  font-size: 18px;
+  transition: all 0.3s ease;
+  padding: 10px 20px;
 }
 
-/* ----------- SIDEBAR STYLES ----------- */
-
-/* Main sidebar background */
-.skin-blue .main-sidebar {
-  background-color: #2C3E50 !important;  /* Background color */
+/* Pestaña activa */
+.tabbable > .nav > li.active > a,
+.tabbable > .nav > li.active > a:hover {
+  background-color: #898AC4 !important;
+  color: white !important;
+  font-weight: bold;
+  border-bottom: 3px solid #4d4e99 !important;
 }
 
-/* Menu items text */
-.skin-blue .main-sidebar .sidebar .sidebar-menu a {
-  color: #ECF0F1 !important;  /* Normal text color */
+/* Efecto hover */
+.tabbable > .nav > li > a:hover {
+  background-color: #34495E !important;
+  transform: translateY(-2px);
+}
+
+/* Contenido de pestañas */
+.tab-content {
+  background-color: #f9f9f9;
+  padding: 20px;
+  border-radius: 0 0 5px 5px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  min-height: calc(100vh - 150px);
+}
+
+/* Iconos en pestañas */
+.tabbable > .nav > li > a > i {
+  margin-right: 8px;
+}
+
+/* ========== TAB STYLES ========== */
+/* Main tab container */
+.nav-tabs {
+  border-bottom: 2px solid #4d4e99 !important;
+  background-color: #2C3E50 !important;
+}
+
+/* Individual tabs */
+.nav-tabs > li > a {
+  color: #ECF0F1 !important;
   font-family: 'Arial', sans-serif;
   font-size: 14px;
-  border-left: 3px solid transparent !important;
-}
-
-/* Active/selected menu items */
-.skin-blue .main-sidebar .sidebar .sidebar-menu .active a {
-  background-color: #34495E !important;
-  color: #FFFFFF !important;
-  font-weight: bold;
-  border-left: 3px solid #4d4e99 !important;
-}
-
-/* Icons styling */
-.skin-blue .main-sidebar .sidebar .sidebar-menu .fa {
-  width: 20px;
-  color: #BDC3C7 !important;
-}
-
-/* Submenus (if used) */
-.skin-blue .sidebar-menu > li > .treeview-menu {
-  background-color: #1A242F !important;
-  margin: 0 !important;
-}
-
-/* Items separator */
-.skin-blue .sidebar-menu li.header {
-  color: #7F8C8D !important;
-  background-color: #1A242F !important;
-  font-size: 12px;
-  padding: 10px 15px !important;
-}
-
-/* ----------- ADVANCED DESIGN EXTRAS ----------- */
-
-/* Modern shadow effect */
-.main-sidebar {
-  box-shadow: 2px 0 10px rgba(0,0,0,0.1) !important;
-}
-
-/* Smooth state transitions */
-.sidebar-menu li a {
+  border: none !important;
+  margin-right: 2px !important;
+  border-radius: 0 !important;
   transition: all 0.3s ease !important;
 }
 
-/* ------------------------------------- */
-/* Estilos compactos para tablas DT      */
-/* ------------------------------------- */
+/* Active tab */
+.nav-tabs > li.active > a,
+.nav-tabs > li.active > a:hover,
+.nav-tabs > li.active > a:focus {
+  background-color: #898AC4 !important;
+  color: #FFFFFF !important;
+  font-weight: bold;
+  border: none !important;
+}
 
-/* Encabezados de columna */
+/* Hover effect for tabs */
+.nav-tabs > li > a:hover {
+  background-color: #34495E !important;
+  color: #FFFFFF !important;
+  border: none !important;
+}
+
+/* ========== CONTENT BOX STYLES ========== */
+/* Box headers */
+.box-title {
+  color: #4d4e99 !important;
+  font-weight: bold;
+}
+
+/* Box content */
+.box {
+  border-top: 3px solid #4d4e99 !important;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1) !important;
+}
+
+/* ========== BUTTON STYLES ========== */
+.btn-primary {
+  background-color: #4d4e99 !important;
+  border-color: #3d3e7d !important;
+}
+
+.btn-primary:hover {
+  background-color: #3d3e7d !important;
+  border-color: #2d2e5d !important;
+}
+
+/* ========== TABLE STYLES  ========== */
 table.dataTable thead th {
-  max-width: 150px !important;    /* Ancho máximo */
-  overflow: hidden !important; /* Oculta el texto desbordado */
-  text-overflow: ellipsis !important; /* Añade ... si el texto es largo */
+  max-width: 150px !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
 }
 
-/* Tooltip para texto completo */
-table.dataTable thead th.dt-compact:hover::after {
-  content: attr(title);
-  position: absolute;
-  background: #333;
-  color: white;
-  padding: 4px 8px;
-  border-radius: 3px;
-  font-size: 12px;
-  z-index: 10000;
-}
-
-/* Celdas del cuerpo */
 table.dataTable tbody td {
-  max-width: 150px !important;    /* Ancho máximo */
+  max-width: 150px !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
 }
 
-/* Cambiar el color del select */
 table.dataTable tbody > tr > td.selected {
   background-color: #898AC4 !important;
   border: 2px solid #898AC4 !important;
   transition: all 0.3s ease;
 }
 
-/* Efecto hover */
 table.dataTable tbody > tr > td.selected:hover {
   background-color: #898AC4 !important;
 }
+
+/* ========== LAYOUT ELEMENTS ========== */

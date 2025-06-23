@@ -7,25 +7,60 @@ library(ggrepel)
 library(igraph)
 library(heatmaply)
 library(viridis)
+library(writexl)
+source("./scripts/simulator.R")
 
 server <- function(input, output, session) {
   # Reactive value to store uploaded data
+  Z_aug <- reactive(MIPS_BR[[input$state]])
+  ZALfx_multipliers <- reactive(get_ZALfx_multipliers(Z_aug(), N_SECTORS))
+
+  L <- reactive(ZALfx_multipliers()$L)
+  f <- reactive(ZALfx_multipliers()$f)
+  x <- reactive(ZALfx_multipliers()$x)
+  multipliers <- reactive(ZALfx_multipliers()$multipliers)
+
   uploaded_data <- reactiveVal(NULL)
   matrix_L <- reactiveVal(NULL)
   sum_result <- reactiveVal(NULL)
 
-  # :::::::::::::::::::::::::::::: TAB 1 ::::::::::::::::::::::::::::::::::::::::::
+  # :::::::::::::::::::::::::: TAB 2 - SUMMARY :::::::::::::::::::::::::::::::::
+
+  # Custom header
+  output$summary_header <- renderUI({
+    req(input$state) # Requires state selection
+
+    # Get full state name from states data
+    full_name <- STATES_CSV$fullname[STATES_CSV$id == input$state]
+
+    h2(paste("Data Summary for", full_name))
+  })
+
+  output$multipliers_title <- renderUI({
+    req(multipliers) # Requires state selection
+    h2("Multipliers")
+  })
+
+  debug_values <- reactiveValues(multi_data = NULL)
 
   # Render a barplot
   output$multiplier_plot <- renderPlot({
-    # Order
+    req(multipliers())
+
+    # 1. Store multipliers() in 'multi' and sort by multiplier (descending)
+    multi <- multipliers() %>%
+      arrange(desc(multiplier))
+
+    # 2. Trim sector names to first 40 characters
+    multi$sector <- substr(multi$sector, start = 1, stop = 40) # start=1 (no 0) para evitar errores
+
+    # 3. Convert to factor while preserving current order
     multi <- multi %>%
-      arrange(desc(multi)) %>%
       mutate(sector = factor(sector, levels = unique(sector)))
 
-    # Reduce sector label
-    # multi$sector <- str_trunc(multi$sector, 25, side = "right")
-    multi$sector <- substr(multi$sector, start = 0, stop = 40)
+    # Debug errors
+    debug_values$multi_data <- multi
+    print(head(debug_values$multi_data))
 
     # Graph
     ggplot(multi, aes(
@@ -35,16 +70,6 @@ server <- function(input, output, session) {
       label = round(multiplier, 2)
     )) +
       geom_bar(stat = "identity", position = position_dodge(width = 0.96)) +
-      # geom_label(
-      #   position = position_dodge(width = 0.96),
-      #   fill = "white"
-      #   vjust = -0.9,
-      #   check_overlap = TRUE,
-      #   fontface = "bold",
-      #   size = 3,
-      #   angle = 0,
-      #   color = "black",
-      # )
       geom_label_repel(
         aes(group = sector), # Alinea con los grupos creados por fill
         position = position_dodge(width = 0.96),
@@ -64,7 +89,12 @@ server <- function(input, output, session) {
       theme(
         axis.text.x = element_text(angle = 45, hjust = 1),
         legend.position = "bottom",
-        plot.title = element_text(hjust = 0.5, face = "bold")
+        plot.margin = margin(t = 20, r = 10, b = 40, l = 10, unit = "pt"), # Ajuste clave
+        plot.title = element_text(
+          hjust = 0.5,
+          face = "bold",
+          margin = margin(b = 20) # Espacio bajo el título
+        ),
       ) +
       guides(
         fill = guide_legend(ncol = 4, nrow = 10)
@@ -72,57 +102,38 @@ server <- function(input, output, session) {
       scale_fill_viridis_d(option = "G")
   })
 
-  # States data
-  state_data <- reactive({
-    req(input$state)
 
-    # Find file with regex
-    pattern <- sprintf("mip_ixi_br_%s_d_\\d{4}\\.(tsv|xlsx)", input$state)
-    files <- list.files("data/", pattern = pattern, full.names = TRUE)
+  # States multiplier table
+  shock_multipliers <- reactive(rep(input$shock_multiplier, N_SECTORS))
 
-    if (length(files) == 0) {
-      showNotification("No file found for this State", type = "warning")
-      return(NULL)
-    }
-
-    # Search for the most recent file
-    selected_file <- files[1]
-
-    # Read file by it's MIME
-    ext1 <- tools::file_ext(selected_file)
-
-    tryCatch(
-      {
-        if (ext1 == "tsv") {
-          dfState <- read.delim(selected_file, na.strings = c("", "NA", "N/A"))
-        } else if (ext1 == "xlsx") {
-          dfState <- read_excel(selected_file, na = c("", "NA", "N/A"))
-        }
-
-        # Limpieza segura de datos:
-        if (!is.null(dfState)) {
-          dfState <- dfState %>%
-            mutate(across(where(is.numeric), ~ ifelse(is.na(.), 0, .))) %>%
-            mutate(across(where(is.character), ~ ifelse(is.na(.), "", .)))
-        }
-
-        return(dfState)
-      },
-      error = function(e) {
-        showNotification(paste("Error loading state data:", e$messageState), type = "error")
-        return(NULL)
-      }
+  results_raw <- reactive(
+    simulate_demand_shocks(
+      shock_multipliers(),
+      L(),
+      f(),
+      x(),
+      shocks_are_multipliers = TRUE
     )
+  )
+
+  results <- reactive({
+    results_raw() |>
+      mutate(
+        sector = multipliers()$sector,
+        region = multipliers()$region
+      )
   })
 
+  output$results <- renderDataTable(results())
+
   # Render state table
-  output$state_data <- renderDT({
-    req(state_data())
+  output$multipliers <- renderDT({
+    req(multipliers())
     datatable(
-      state_data(),
+      multipliers(),
       options = list(
         scrollX = TRUE,
-        pageLength = 35,
+        pageLength = 15,
         language = list(search = "Search:"),
 
         # Give tooltip the title of the column
@@ -138,6 +149,41 @@ server <- function(input, output, session) {
     )
   })
 
+  output$download_buttons_mult <- renderUI({
+    req(multipliers())
+    div(
+      style = "margin-top: 20px;",
+      downloadButton("download_xlsx_mult", "Download XLSX",
+        style = "color: white; background-color: #4CAF50; margin-right: 10px;"
+      ),
+      downloadButton("download_tsv_mult", "Download TSV",
+        style = "color: white; background-color: #2196F3;"
+      )
+    )
+  })
+
+  # XLSX Download Handler
+  output$download_xlsx_mult <- downloadHandler(
+    filename = function() {
+      paste("multipliers-", input$state, "-", Sys.Date(), ".xlsx", sep = "")
+    },
+    content = function(file) {
+      req(multipliers())
+      writexl::write_xlsx(multipliers(), file)
+    }
+  )
+
+  # TSV Download Handler
+  output$download_tsv_mult <- downloadHandler(
+    filename = function() {
+      paste("multipliers-", input$state, "-", Sys.Date(), ".tsv", sep = "")
+    },
+    content = function(file) {
+      req(multipliers())
+      readr::write_tsv(multipliers(), file)
+    }
+  )
+
   # Data for summary
   datos <- reactive({
     data.frame(
@@ -150,8 +196,6 @@ server <- function(input, output, session) {
   output$tabla_summary <- renderDT({
     datatable(datos())
   })
-
-  # :::::::::::::::::::::::::::::: TAB 2 ::::::::::::::::::::::::::::::::::::::::::
 
   # Show titles only if file is TRUE
   output$h3UpData <- renderUI({
@@ -169,7 +213,7 @@ server <- function(input, output, session) {
     req(input$uploadFile) # Solo continua si hay archivo
     div(
       style = "margin-top: 25px;",
-      actionButton("calcule", "Calculate matrix")
+      actionButton("calcule", "Calculate Matrix")
     )
   })
 
@@ -213,7 +257,7 @@ server <- function(input, output, session) {
 
     values <- uploaded_data()[[2]]
 
-    # Calculate matrix L (sum matrix)
+    # Calculate Matrix L (sum matrix)
     l_matrix <- outer(values, values, `+`)
     colnames(l_matrix) <- paste0("V", 1:ncol(l_matrix))
     rownames(l_matrix) <- paste0("V", 1:nrow(l_matrix))

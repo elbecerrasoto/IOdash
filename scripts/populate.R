@@ -2,11 +2,12 @@
 library(tidyverse)
 library(glue)
 library(furrr)
-source("clean.R")
+source("scripts/clean.R")
 
 # ---- globals
 
 DOWNLOAD <- TRUE
+WRITE_TO_TSV <- TRUE
 STEM <- "https://www.inegi.org.mx/contenidos/investigacion/coumip/tabulados"
 
 DATA_DIR <- "data"
@@ -25,14 +26,22 @@ if (.Platform$OS.type == "windows") {
 
 URLs <- str_c(STEM, "/mip_ixi_br_", STATE_CODES, "_d_2018.xlsx") |>
   set_names(STATE_CODES)
-
+TSVs <- str_c(STEM, "/mip_ixi_br_", STATE_CODES, "_d_2018.tsv") |>
+  set_names(STATE_CODES)
 # ---- code
 
 main <- function(state_code) {
   url_i <- URLs[[state_code]]
-  xlsx_i <- get_xlsx(url_i, DATA_DIR, download = DOWNLOAD)
+  tsv_i <- TSVs[[state_code]]
 
-  clean_mipbr_xlsx(xlsx_i)
+  xlsx_i <- get_xlsx(url_i, DATA_DIR, download = DOWNLOAD)
+  out_tib <- clean_mipbr_xlsx(xlsx_i)
+
+  if (WRITE_TO_TSV) {
+    write_tsv(out_tib, tsv_i)
+  }
+
+  out_tib
 }
 
 done <- future_map(STATE_CODES, main)
