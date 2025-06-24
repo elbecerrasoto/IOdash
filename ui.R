@@ -23,7 +23,7 @@ ui <- fluidPage(
     id = "mainTabs",
     type = "tabs",
 
-    # Second tab: Summary
+    # tab: Summary
     tabPanel(
       "Mulitpliers",
       uiOutput("summary_header"), # Dynamic header
@@ -46,74 +46,11 @@ ui <- fluidPage(
       uiOutput("download_buttons_mult")
     ),
 
-    # Third tab: Production Simulator
-    tabPanel(
-      "Production Sim",
-      h2("Production Simulator"),
-      p("This is a text for explaining how to use the simulator"),
-      fluidRow(
-        column(
-          width = 4,
-          fileInput(
-            "uploadFile",
-            "Upload TSV file",
-            accept = c(".tsv", "text/tsv", ".xlsx"),
-            buttonLabel = "Upload..."
-          )
-        ),
-        column(
-          width = 4,
-          div(
-            style = "margin-top: 25px;",
-            uiOutput("buttonCalc")
-          )
-        )
-      ),
-      uiOutput("h3UpData"),
-      DTOutput("uploadedTable"),
-      uiOutput("sumMatL"),
-      DTOutput("matrixL")
-    ),
 
-    # Fourth tab: Employment Simulator
+    # tab: Simulator
     tabPanel(
-      "Employment Sim",
-      h2("Employment Simulator"),
-      p("This is a text for explaining how to use the simulator"),
-      h3("1. Upload your file"),
-      fluidRow(
-        column(
-          width = 4,
-          fileInput(
-            "uploadFile",
-            "Upload TSV file",
-            accept = c(".tsv", "text/tsv", ".xlsx"),
-            buttonLabel = "Upload..."
-          )
-        ),
-        column(
-          width = 4,
-          div(
-            style = "margin-top: 25px;",
-            uiOutput("buttonCalc")
-          )
-        )
-      ),
-      h3("2. Choose options for your analysis"),
-      uiOutput("h3UpData"),
-      DTOutput("uploadedTable"),
-      uiOutput("sumMatL"),
-      DTOutput("matrixL")
-    ),
-
-    # Fifth tab: Explore
-    tabPanel(
-      "Explore",
-      h2("Data Visualizations"),
-      fluidRow(
-        box(title = "Heatmap", plotlyOutput("heatmap")),
-        box(title = "Directed Graph", plotOutput("grafo"))
-      )
+      "Simulator",
+      h2("Simulator")
     )
   )
 )
