@@ -46,11 +46,14 @@ ui <- fluidPage(
       uiOutput("download_buttons_mult")
     ),
 
-
     # tab: Simulator
     tabPanel(
       "Simulator",
-      h2("Simulator")
+      h2("Simulator"),
+      valueBoxOutput("gdp_state_box"),
+      valueBoxOutput("gdp_rest_box"),
+      valueBoxOutput("employment_state_box"),
+      valueBoxOutput("employment_rest_box")
     )
   )
 )
