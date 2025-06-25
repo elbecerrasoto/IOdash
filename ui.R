@@ -50,10 +50,14 @@ ui <- fluidPage(
     tabPanel(
       "Simulator",
       h2("Simulator"),
-      valueBoxOutput("gdp_state_box"),
-      valueBoxOutput("gdp_rest_box"),
-      valueBoxOutput("employment_state_box"),
-      valueBoxOutput("employment_rest_box")
+      fluidRow(
+        column(6, valueBoxOutput("gdp_state_box")),
+        column(6, valueBoxOutput("gdp_rest_box")),
+      ),
+      fluidRow(
+        column(6, valueBoxOutput("employment_state_box")),
+        column(6, valueBoxOutput("employment_rest_box")),
+      )
     )
   )
 )
